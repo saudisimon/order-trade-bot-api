@@ -238,6 +238,7 @@ class ByBit:
     def exit_position(self, ticker):
         #   CLOSE POSITION IF ONE IS ONGOING
         r = self._try_request('my_position', symbol=ticker)
+        logbot.logs(f">>> {r}")
         if not r['success']:
             return r
         logbot.logs(">>> Retrieve positions")
