@@ -97,14 +97,14 @@ class ByBit:
             take_profit = payload['short TP']
         
         r = self._try_request('query_symbol')
+        if not r['success']:
+            return r
         r = r['result']
         my_item = next((item for item in r if item['name'] == 'BTCUSDT'), None)
         qty_step = my_item['lot_size_filter']['qty_step']
 
         # 0/ Get free collateral and calculate position
         r = self._try_request('get_wallet_balance', coin="USDT")
-        if not r['success']:
-            return r
         free_collateral = r['result']['USDT']['available_balance']
         logbot.logs('>>> Found free collateral : {}'.format(free_collateral))
         size = (free_collateral * self.risk) / abs(payload['price'] - stop_loss)
@@ -238,7 +238,6 @@ class ByBit:
     def exit_position(self, ticker):
         #   CLOSE POSITION IF ONE IS ONGOING
         r = self._try_request('my_position', symbol=ticker)
-        logbot.logs(f">>> {r}")
         if not r['success']:
             return r
         logbot.logs(">>> Retrieve positions")
