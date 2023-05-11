@@ -87,8 +87,9 @@ class ByBit:
 
         side = 'Buy'
         close_sl_tp_side = 'Sell'
-        stop_loss = payload['long SL']
-        take_profit = payload['long TP']
+        if payload['action'] == 'buy':
+            stop_loss = payload['long SL']
+            take_profit = payload['long TP']
 
         if payload['action'] == 'sell':
             side = 'Sell'
