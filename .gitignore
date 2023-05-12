@@ -9,6 +9,7 @@
 venv
 .idea
 discord_bot/
+config.py
 pinestrategies/
 README_images
 

@@ -8,6 +8,7 @@ leverage = 1.0
 risk = 1.0 / 100
 api_key = 'API_KEY'
 api_secret = 'API_SECRET'
+testnet = True
 
 
 # ================== SET GLOBAL VARIABLES ==================
@@ -19,30 +20,34 @@ def global_var(payload):
     global risk
     global api_key
     global api_secret
+    global testnet
 
     subaccount_name = payload['subaccount']
 
-    if subaccount_name == 'test3python':
-        leverage = os.environ.get('LEVERAGE_TESTING', config.LEVERAGE_TESTING)
+    if subaccount_name == os.environ['API_SUB_ACCOUNT_NAME_TESTING']:
+        testnet = True
+        leverage = os.environ['LEVERAGE_TESTING']
         leverage = float(leverage)
 
-        risk = os.environ.get('RISK_TESTING', config.RISK_TESTING)
+        risk = os.environ['RISK_TESTING']
         risk = float(risk) / 100
 
-        api_key = os.environ.get('API_KEY_TESTING', config.API_KEY_TESTING)
+        api_key = os.environ['API_KEY_TESTING']
 
-        api_secret = os.environ.get('API_SECRET_TESTING', config.API_SECRET_TESTING)
+        api_secret = os.environ['API_SECRET_TESTING']
 
-    elif subaccount_name == 'MYBYBITACCOUNT':
-        leverage = os.environ.get('LEVERAGE_MYBYBITACCOUNT', config.LEVERAGE_MYBYBITACCOUNT)
+    elif subaccount_name == os.environ['API_SUB_ACCOUNT_NAME']:
+        testnet = False
+
+        leverage = os.environ['LEVERAGE_MYBYBITACCOUNT']
         leverage = float(leverage)
 
-        risk = os.environ.get('RISK_MYBYBITACCOUNT', config.RISK_MYBYBITACCOUNT)
+        risk = os.environ['RISK_MYBYBITACCOUNT']
         risk = float(risk) / 100
 
-        api_key = os.environ.get('API_KEY_MYBYBITACCOUNT', config.API_KEY_MYBYBITACCOUNT)
+        api_key = os.environ['API_KEY_MYBYBITACCOUNT']
 
-        api_secret = os.environ.get('API_SECRET_MYBYBITACCOUNT', config.API_SECRET_MYBYBITACCOUNT)
+        api_secret = os.environ['API_SECRET_MYBYBITACCOUNT']
 
     else:
         logbot.logs(">>> /!\ Subaccount name not found", True)
@@ -70,7 +75,8 @@ def order(payload: dict):
         'leverage': leverage,
         'risk': risk,
         'api_key': api_key,
-        'api_secret': api_secret
+        'api_secret': api_secret,
+        'testnet': testnet
     }
     exchange = payload['exchange']
     

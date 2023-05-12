@@ -16,7 +16,7 @@ def tradingview_webhook():
     
     data = json.loads(request.data)
 
-    webhook_passphrase = os.environ.get('WEBHOOK_PASSPHRASE', config.WEBHOOK_PASSPHRASE)
+    webhook_passphrase = os.environ['WEBHOOK_PASSPHRASE']
 
     if 'passphrase' not in data.keys():
         logbot.logs(">>> /!\ No passphrase entered", True)
@@ -36,7 +36,6 @@ def tradingview_webhook():
     print(orders)
     try:
         chart_url = 'https://www.tradingview.com'
-        # del data["chart_url"]
         logbot.study_alert(json.dumps(orders), chart_url)
     except KeyError:
         logbot.logs(">>> /!\ Key 'chart_url' not found", True)
@@ -49,7 +48,7 @@ def discord_study_tv():
     
     data = json.loads(request.data)
 
-    webhook_passphrase = os.environ.get('WEBHOOK_PASSPHRASE', config.WEBHOOK_PASSPHRASE)
+    webhook_passphrase = os.environ['WEBHOOK_PASSPHRASE']
 
     if 'passphrase' not in data.keys():
         logbot.logs(">>> /!\ No passphrase entered", True)

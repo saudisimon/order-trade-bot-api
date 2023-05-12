@@ -3,14 +3,15 @@ from pybit import HTTP
 
 class ByBit:
     def __init__(self, var: dict):
-        self.ENDPOINT = 'https://api-testnet.bybit.com'
-
         self.subaccount_name = var['subaccount_name']
         self.leverage = var['leverage']
         self.risk = var['risk']
         self.api_key = var['api_key']
         self.api_secret = var['api_secret']
-
+        if var['testnet']:
+            self.ENDPOINT = 'https://api-testnet.bybit.com'
+        else:
+            self.ENDPOINT = 'https://api.bybit.com'
     # =============== SIGN, POST AND REQUEST ===============
 
     def _try_request(self, method: str, **kwargs):
