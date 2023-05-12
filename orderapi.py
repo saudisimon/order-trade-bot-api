@@ -1,5 +1,5 @@
 import logbot
-import json, os, config
+import json, os
 from ftxapi import Ftx
 from bybitapi import ByBit
 

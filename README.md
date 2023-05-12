@@ -169,7 +169,7 @@ return orders
 The **orderapi** python file contains the global variables that we will get : **subaccount** to use, **leverage** to use (or not), maximum **risk per trade** (in %), the **api key** and **api secret**. To retrieve them the concept is the same as with the password except that these values will depend according to the subaccount you are using, therefore right at the beginning of the ```order()``` function we will call ```global_var()``` that will get from the payload the subaccount name and set the values accordingly.
 
 ```python
-import os, config
+import os
 
 subaccount_name = payload['subaccount']
 if subaccount_name == 'Testing':
@@ -177,7 +177,7 @@ if subaccount_name == 'Testing':
     risk = float(risk) / 100
     # ...
 elif subaccount_name == 'STRATEGY_TWO':
-    # ...
+# ...
 ```
 
 ### Exchange and tickers <a name="exchangetickers"></a>

@@ -1,4 +1,4 @@
-import requests, config, os
+import requests, os
 
 
 DISCORD_LOGS_URL = os.environ['DISCORD_LOGS_URL']
