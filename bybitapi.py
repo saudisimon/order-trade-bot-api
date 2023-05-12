@@ -18,6 +18,8 @@ class ByBit:
         try:
             if method=='get_wallet_balance':
                 req = session.get_wallet_balance(coin=kwargs.get('coin'))
+            elif method=='last_traded_price':
+                req = session.last_traded_price(symbol=kwargs.get('symbol'))
             elif method=='my_position':
                 req = session.my_position(symbol=kwargs.get('symbol'))
             elif method=='place_active_order':
@@ -87,15 +89,20 @@ class ByBit:
 
         side = 'Buy'
         close_sl_tp_side = 'Sell'
+        stop_loss = take_profit = ''
         if payload['action'] == 'buy':
-            stop_loss = payload['long SL']
-            take_profit = payload['long TP']
+            if 'long SL' in payload.keys():
+                stop_loss = payload['long SL']
+            if 'long TP' in payload.keys():
+                take_profit = payload['long TP']
 
         if payload['action'] == 'sell':
             side = 'Sell'
             close_sl_tp_side = 'Buy'
-            stop_loss = payload['short SL']
-            take_profit = payload['short TP']
+            if 'short SL' in payload.keys():
+                stop_loss = payload['short SL']
+            if 'short TP' in payload.keys():
+                take_profit = payload['short TP']
         
         r = self._try_request('query_symbol')
         if not r['success']:
@@ -108,7 +115,18 @@ class ByBit:
         r = self._try_request('get_wallet_balance', coin="USDT")
         free_collateral = r['result']['USDT']['available_balance']
         logbot.logs('>>> Found free collateral : {}'.format(free_collateral))
-        size = (free_collateral * self.risk) / abs(payload['price'] - stop_loss)
+
+        if 'price' not in payload.keys():
+            r = self._try_request('last_traded_price', symbol=ticker)
+            if not r['success']:
+                return r
+            r = r['result']
+            payload['price'] = float(r['price'])
+        if 'order_size' in payload.keys():
+            size = payload['order_size'] / abs(payload['price'])
+        else:
+            size = (free_collateral * self.risk) / abs(payload['price'] - stop_loss)
+
         if (size / (free_collateral / payload['price'])) > self.leverage:
             return {
                     "success" : False,
