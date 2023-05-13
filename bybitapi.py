@@ -90,7 +90,7 @@ class ByBit:
 
         side = 'Buy'
         close_sl_tp_side = 'Sell'
-        stop_loss = take_profit = ''
+        stop_loss = take_profit = None
         if payload['action'] == 'buy':
             if 'long SL' in payload.keys():
                 stop_loss = payload['long SL']
@@ -126,7 +126,8 @@ class ByBit:
         if 'order_size' in payload.keys():
             size = payload['order_size'] / abs(payload['price'])
         else:
-            size = (free_collateral * self.risk) / abs(payload['price'] - stop_loss)
+            if stop_loss:
+                size = (free_collateral * self.risk) / abs(payload['price'] - stop_loss)
 
         if (size / (free_collateral / payload['price'])) > self.leverage:
             return {
@@ -136,8 +137,12 @@ class ByBit:
         
         size = self._rounded_size(size, qty_step)
 
-        logbot.logs(f">>> SIZE : {size}, SIDE : {side}, PRICE : {payload['price']}, SL : {stop_loss}, TP : {take_profit}")
-     
+        logbot.logs(f">>> SIZE : {size}, SIDE : {side}, PRICE : {payload['price']}")
+        if stop_loss:
+            logbot.logs(f">>> SL : {stop_loss}")
+        if take_profit:
+            logbot.logs(f">>> TP : {take_profit}")
+
         # 1/ place order with stop loss
         if 'type' in payload.keys():
             order_type = payload['type'] # 'market' or 'limit'
