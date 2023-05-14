@@ -77,9 +77,10 @@ def discord_study_tv():
     return {
         "success": True
     }
-# try:
-#     schedule.every(2).seconds.do(hello_trader)
-# except Exception as e:
-#     pass
-# while True:
-#     schedule.run_pending()
+try:
+    schedule.every(2).seconds.do(hello_trader)
+except Exception as e:
+    logbot.logs('>>> /!\ An exception occured schedule : {}'.format(e), True)
+    pass
+while True:
+    schedule.run_pending()
