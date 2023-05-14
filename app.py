@@ -2,7 +2,6 @@ import logbot
 import json, os
 from flask import Flask, request
 from orderapi import order
-import schedule
 
 app = Flask(__name__)
 
@@ -77,10 +76,3 @@ def discord_study_tv():
     return {
         "success": True
     }
-try:
-    schedule.every(2).seconds.do(hello_trader)
-except Exception as e:
-    logbot.logs('>>> /!\ An exception occured schedule : {}'.format(e), True)
-    pass
-while True:
-    schedule.run_pending()
