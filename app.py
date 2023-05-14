@@ -2,12 +2,14 @@ import logbot
 import json, os
 from flask import Flask, request
 from orderapi import order
+import schedule
 
 app = Flask(__name__)
 
 @app.route("/")
 def hello_trader():
-    return "<p>Hello young trader!</p>"
+    print('RESTART WORKER')
+    return "<p>Hello! You Alive</p>"
 
 @app.route("/tradingview-to-webhook-order", methods=['POST'])
 def tradingview_webhook():
@@ -75,3 +77,9 @@ def discord_study_tv():
     return {
         "success": True
     }
+try:
+    schedule.every(10).minutes.do(hello_trader)
+except Exception as e:
+    pass
+while True:
+    schedule.run_pending()
