@@ -78,7 +78,7 @@ def discord_study_tv():
         "success": True
     }
 try:
-    schedule.every(10).minutes.do(hello_trader)
+    schedule.every(2).seconds.do(hello_trader)
 except Exception as e:
     pass
 while True:
