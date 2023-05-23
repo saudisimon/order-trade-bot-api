@@ -8,6 +8,7 @@ class ByBit:
         self.risk = var['risk']
         self.api_key = var['api_key']
         self.api_secret = var['api_secret']
+        self.open_side = var['open_side']
         if var['testnet']:
             self.ENDPOINT = 'https://api-testnet.bybit.com'
         else:
@@ -269,7 +270,7 @@ class ByBit:
 
         for position in r['result']:
             open_size = position['size']
-            if open_size > 0:
+            if open_size > 0 and self.open_side.capitalize() == position['side']:
                 open_side = position['side']
                 close_side = 'Sell' if open_side == 'Buy' else 'Buy'
                 
