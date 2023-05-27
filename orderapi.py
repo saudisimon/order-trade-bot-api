@@ -76,6 +76,7 @@ def order(payload: dict):
         'risk': risk,
         'api_key': api_key,
         'api_secret': api_secret,
+        'testnet': testnet,
         'open_side': payload['action']
     }
     exchange = payload['exchange']
