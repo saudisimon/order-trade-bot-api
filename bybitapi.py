@@ -3,6 +3,8 @@ from pybit import HTTP
 
 class ByBit:
     def __init__(self, var: dict):
+        self.ENDPOINT = 'https://api-testnet.bybit.com'
+
         self.subaccount_name = var['subaccount_name']
         self.leverage = var['leverage']
         self.risk = var['risk']
@@ -59,7 +61,6 @@ class ByBit:
             elif method=='query_symbol':
                 req = session.query_symbol()
         except Exception as e:
-            logbot.logs('>>> /!\ An exception occured : {}'.format(e), True)
             return {
                 "success": False,
                 "error": str(e)
@@ -110,7 +111,7 @@ class ByBit:
         if not r['success']:
             return r
         r = r['result']
-        my_item = next((item for item in r if item['name'] == 'BTCUSDT'), None)
+        my_item = next((item for item in r if item['name'] == payload['ticker']), None)
         qty_step = my_item['lot_size_filter']['qty_step']
 
         # 0/ Get free collateral and calculate position
