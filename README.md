@@ -1,5 +1,3 @@
-Here is the reformatted readme file:
-
 # Trade Order Webhook
 
 ## Presentation
