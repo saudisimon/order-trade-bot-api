@@ -9,6 +9,7 @@ risk = 1.0 / 100
 api_key = 'API_KEY'
 api_secret = 'API_SECRET'
 testnet = True
+discord_alert_format = ''
 
 
 # ================== SET GLOBAL VARIABLES ==================
@@ -21,6 +22,7 @@ def global_var(payload):
     global api_key
     global api_secret
     global testnet
+    global discord_alert_format
 
     subaccount_name = payload['subaccount']
 
@@ -50,7 +52,7 @@ def global_var(payload):
         api_secret = os.environ['API_SECRET_MYBYBITACCOUNT']
 
     else:
-        logbot.logs(">>> /!\ Subaccount name not found", True)
+        logbot.logs("Subaccount name not found", True)
         return {
             "success": False,
             "error": "subaccount name not found"
@@ -76,7 +78,8 @@ def order(payload: dict):
         'risk': risk,
         'api_key': api_key,
         'api_secret': api_secret,
-        'testnet': testnet
+        'testnet': testnet,
+        'open_side': payload['action']
     }
     exchange = payload['exchange']
     
@@ -88,7 +91,6 @@ def order(payload: dict):
         elif exchange.upper() == 'BYBIT':
             exchange_api = ByBit(init_var)
     except Exception as e:
-        logbot.logs('>>> /!\ An exception occured : {}'.format(e), True)
         return {
             "success": False,
             "error": str(e)
@@ -107,7 +109,6 @@ def order(payload: dict):
             try:
                 ticker = tickers[exchange.lower()][payload['ticker']]
             except Exception as e:
-                logbot.logs('>>> /!\ An exception occured : {}'.format(e), True)
                 return {
                     "success": False,
                     "error": str(e)
@@ -117,7 +118,9 @@ def order(payload: dict):
     #   ALERT MESSAGE CONDITIONS
     if payload['message'] == 'entry':
         logbot.logs(">>> Order message : 'entry'")
-        exchange_api.exit_position(ticker)
+        result = exchange_api.exit_position(ticker)
+        if not result['success']:
+            return result
         orders = exchange_api.entry_position(payload, ticker)
         return orders
 

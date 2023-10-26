@@ -3,11 +3,14 @@ from pybit import HTTP
 
 class ByBit:
     def __init__(self, var: dict):
+        self.ENDPOINT = 'https://api-testnet.bybit.com'
+
         self.subaccount_name = var['subaccount_name']
         self.leverage = var['leverage']
         self.risk = var['risk']
         self.api_key = var['api_key']
         self.api_secret = var['api_secret']
+        self.open_side = var['open_side']
         if var['testnet']:
             self.ENDPOINT = 'https://api-testnet.bybit.com'
         else:
@@ -58,7 +61,6 @@ class ByBit:
             elif method=='query_symbol':
                 req = session.query_symbol()
         except Exception as e:
-            logbot.logs('>>> /!\ An exception occured : {}'.format(e), True)
             return {
                 "success": False,
                 "error": str(e)
@@ -90,7 +92,7 @@ class ByBit:
 
         side = 'Buy'
         close_sl_tp_side = 'Sell'
-        stop_loss = take_profit = ''
+        stop_loss = take_profit = None
         if payload['action'] == 'buy':
             if 'long SL' in payload.keys():
                 stop_loss = payload['long SL']
@@ -109,7 +111,7 @@ class ByBit:
         if not r['success']:
             return r
         r = r['result']
-        my_item = next((item for item in r if item['name'] == 'BTCUSDT'), None)
+        my_item = next((item for item in r if item['name'] == payload['ticker']), None)
         qty_step = my_item['lot_size_filter']['qty_step']
 
         # 0/ Get free collateral and calculate position
@@ -126,7 +128,8 @@ class ByBit:
         if 'order_size' in payload.keys():
             size = payload['order_size'] / abs(payload['price'])
         else:
-            size = (free_collateral * self.risk) / abs(payload['price'] - stop_loss)
+            if stop_loss:
+                size = (free_collateral * self.risk) / abs(payload['price'] - stop_loss)
 
         if (size / (free_collateral / payload['price'])) > self.leverage:
             return {
@@ -136,8 +139,12 @@ class ByBit:
         
         size = self._rounded_size(size, qty_step)
 
-        logbot.logs(f">>> SIZE : {size}, SIDE : {side}, PRICE : {payload['price']}, SL : {stop_loss}, TP : {take_profit}")
-     
+        logbot.logs(f">>> SIZE : {size}, SIDE : {side}, PRICE : {payload['price']}")
+        if stop_loss:
+            logbot.logs(f">>> SL : {stop_loss}")
+        if take_profit:
+            logbot.logs(f">>> TP : {take_profit}")
+
         # 1/ place order with stop loss
         if 'type' in payload.keys():
             order_type = payload['type'] # 'market' or 'limit'
@@ -264,7 +271,7 @@ class ByBit:
 
         for position in r['result']:
             open_size = position['size']
-            if open_size > 0:
+            if open_size > 0 and self.open_side.capitalize() == position['side']:
                 open_side = position['side']
                 close_side = 'Sell' if open_side == 'Buy' else 'Buy'
                 
